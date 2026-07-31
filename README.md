@@ -10,13 +10,13 @@ An intelligent, real-time computer vision system that identifies vehicles travel
 
 ---
 
-## 📌 Project Overview
+##  Project Overview
 
 Traffic violations involving wrong-way driving pose high safety risks on highways and urban roads. This system leverages deep learning for vehicle detection and multi-object tracking to analyze movement vectors frame-by-frame. By computing vector alignment via dot-product operations against allowed road trajectory vectors, the pipeline flags violations, triggers visual alerts, logs incident metadata, and saves evidence snapshots.
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 * **Vehicle Detection:** Powered by YOLOv8 for detection across multiple vehicle classes (cars, trucks, buses, motorcycles).
 * **Persistent Tracking:** Uses ByteTrack to maintain continuous track IDs and spatial trajectories across frames.
@@ -41,7 +41,7 @@ Traffic violations involving wrong-way driving pose high safety risks on highway
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 Wrong-Direction-Vehicle-Detection/
