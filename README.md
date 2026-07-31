@@ -1,4 +1,4 @@
-# 🚗 Wrong Direction Vehicle Detection System
+#  Wrong Direction Vehicle Detection System
 
 ![Python Version](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-000000?style=for-the-badge)
