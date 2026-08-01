@@ -1,2 +1,17 @@
+# Python virtual environment
 venv/
+env/
 __pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
+
+# Large media and model files
+videos/*.mp4
+videos/*.avi
+models/*.pt
+
+# Generated outputs and logs
+outputs/
+logs/*.csv
