@@ -64,5 +64,4 @@ Wrong-Direction-Vehicle-Detection/
 ├── videos/                 # Input sample video files[cite: 1]
 ├── .gitignore
 ├── main.py                 # Pipeline execution entrypoint
-├── README.md
 └── requirements.txt        # System dependencies[cite: 1]
