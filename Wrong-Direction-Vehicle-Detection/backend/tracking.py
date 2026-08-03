@@ -1,11 +1,11 @@
 import supervision as sv
 
 class VehicleTracker:
-    def __init__(self, track_thresh=0.25, track_buffer=30):
-        # Initialize the supervision ByteTrack tracker
+    def __init__(self, track_activation_threshold=0.25, lost_track_buffer=30):
+        # Initialize the supervision ByteTrack tracker with the updated argument names
         self.tracker = sv.ByteTrack(
-            track_thresh=track_thresh,
-            track_buffer=track_buffer
+            track_activation_threshold=track_activation_threshold,
+            lost_track_buffer=lost_track_buffer
         )
 
     def update_tracks(self, detections):
@@ -15,8 +15,11 @@ class VehicleTracker:
             padded_xyxy = sv.pad_boxes(detections.xyxy, px=10, py=10)
             detections.xyxy = padded_xyxy
         
-        # Pass the padded YOLO detections into ByteTrack
-        tracked_detections = self.tracker.update_with_detections(detections)
+        # Safely handle the method name change in newer supervision versions
+        if hasattr(self.tracker, 'update_with_detections'):
+            tracked_detections = self.tracker.update_with_detections(detections)
+        else:
+            tracked_detections = self.tracker.update(detections)
         
         return tracked_detections
 
