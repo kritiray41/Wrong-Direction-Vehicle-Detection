@@ -1,36 +1,25 @@
 import supervision as sv
 
 class VehicleTracker:
-    def __init__(self, track_thresh=0.25, track_buffer=30):
-        """
-        Initializes the ByteTrack object.
-        
-        Parameters:
-            track_thresh (float): Detection confidence threshold for track activation.
-            track_buffer (int): Number of frames to buffer when a track is lost.
-        """
-        # Initialize the supervision ByteTrack tracker
+    # 1. Lower the track_thresh to make activation easier
+    def __init__(self, track_thresh=0.1, match_thresh=0.8, track_buffer=30):
         self.tracker = sv.ByteTrack(
             track_thresh=track_thresh,
+            match_thresh=match_thresh,
             track_buffer=track_buffer
         )
 
     def update_tracks(self, detections):
-        """
-        Updates the tracker with new detections and assigns tracking IDs.
+        # 2. Add padding to the bounding boxes to force overlap
+        padded_xyxy = sv.pad_boxes(detections.xyxy, px=10, py=10)
+        detections.xyxy = padded_xyxy
         
-        Parameters:
-            detections (sv.Detections): The detections from the YOLO model.
-            
-        Returns:
-            sv.Detections: The updated detections object, now containing a 'tracker_id' field.
-        """
-        # Pass the YOLO detections into ByteTrack
+        # Now update the tracker
         tracked_detections = self.tracker.update_with_detections(detections)
         
         return tracked_detections
 
-# Quick standalone test to ensure it works with the detector
+# Test script
 if __name__ == "__main__":
     import cv2
     import os
@@ -44,18 +33,14 @@ if __name__ == "__main__":
         
         cap = cv2.VideoCapture(test_video_path)
         
-        # Read two consecutive frames to test tracking
-        for i in range(2):
+        # Read a few more frames to give ByteTrack time to initialize
+        for i in range(5):
             ret, frame = cap.read()
             if ret:
-                # Phase 1: Get raw detections
                 detections = detector.detect_vehicles(frame)
-                
-                # Phase 2: Get tracked detections
                 tracked_detections = tracker.update_tracks(detections)
                 
                 print(f"--- Frame {i} ---")
-                print(f"Detected {len(detections)} raw vehicles.")
                 print(f"Tracking IDs assigned: {tracked_detections.tracker_id}")
                 
         cap.release()
