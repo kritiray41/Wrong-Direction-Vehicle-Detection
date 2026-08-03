@@ -61,6 +61,13 @@ class VideoVisualizer:
                 cv2.line(frame, points[i - 1], points[i], (0, 255, 255), 2)
         return frame
 
+    def setup_video_writer(self, output_path, width, height, fps=30):
+        """
+        Sets up the OpenCV VideoWriter to save the final output.
+        """
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        return cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
     def annotate_frame(self, frame, detections, history_dict=None):
         """
         Draws bounding boxes, labels, FPS, and optional movement trails.
