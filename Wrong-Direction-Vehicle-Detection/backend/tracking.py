@@ -1,3 +1,25 @@
+import supervision as sv
+
+class VehicleTracker:
+    def __init__(self, track_thresh=0.25, track_buffer=30):
+        # Initialize the supervision ByteTrack tracker
+        self.tracker = sv.ByteTrack(
+            track_thresh=track_thresh,
+            track_buffer=track_buffer
+        )
+
+    def update_tracks(self, detections):
+        # Add a small padding to bounding boxes to help tracker maintain ID
+        # across fast-moving frames
+        if not detections.is_empty():
+            padded_xyxy = sv.pad_boxes(detections.xyxy, px=10, py=10)
+            detections.xyxy = padded_xyxy
+        
+        # Pass the padded YOLO detections into ByteTrack
+        tracked_detections = self.tracker.update_with_detections(detections)
+        
+        return tracked_detections
+
 # Quick standalone test to ensure it works with the detector
 if __name__ == "__main__":
     import cv2
@@ -8,13 +30,12 @@ if __name__ == "__main__":
     
     if os.path.exists(test_video_path):
         detector = VehicleDetector()
-        # Initialize tracker
-        tracker = VehicleTracker() 
+        tracker = VehicleTracker()
         
         cap = cv2.VideoCapture(test_video_path)
         
-        # INCREASED TO 10 FRAMES
-        for i in range(10): 
+        # INCREASED TO 15 FRAMES to allow the tracker time to initialize
+        for i in range(15):
             ret, frame = cap.read()
             if ret:
                 # Phase 1: Get raw detections
@@ -25,6 +46,13 @@ if __name__ == "__main__":
                 
                 print(f"--- Frame {i} ---")
                 print(f"Detected {len(detections)} raw vehicles.")
-                print(f"Tracking IDs assigned: {tracked_detections.tracker_id}")
+                
+                # Check if tracker_id has been populated yet
+                if tracked_detections.tracker_id is not None:
+                    print(f"Tracking IDs assigned: {tracked_detections.tracker_id}")
+                else:
+                    print("Tracking IDs assigned: [] (Tracker initializing...)")
                 
         cap.release()
+    else:
+        print("Test video not found!")
