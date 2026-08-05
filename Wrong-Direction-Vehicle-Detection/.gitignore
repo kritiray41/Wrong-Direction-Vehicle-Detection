@@ -15,3 +15,4 @@ models/*.pt
 # Generated outputs and logs
 outputs/
 logs/*.csv
+final_output.mp4
