@@ -9,6 +9,7 @@ from backend.detection import VehicleDetector
 from backend.tracking import VehicleTracker
 from backend.direction import DirectionAnalyzer
 from utils.visualizer import VideoVisualizer, VehicleHistory
+from utils.logger import ViolationLogger 
 
 def run_pipeline(video_path, output_path):
     print(f"Starting pipeline on: {video_path}")
@@ -20,6 +21,7 @@ def run_pipeline(video_path, output_path):
     direction_analyzer = DirectionAnalyzer(allowed_direction_vector=(0, 1))
     visualizer = VideoVisualizer()
     history = VehicleHistory()
+    logger = ViolationLogger()
     
     cap = cv2.VideoCapture(video_path)
     
@@ -62,6 +64,8 @@ def run_pipeline(video_path, output_path):
                 
                 if is_wrong_way:
                     wrong_way_ids.append(tracker_id)
+                    # THIS IS THE NEW LINE: Log the violation!
+                    logger.log_violation(tracker_id)
         
         # Draw bounding boxes, labels, and trails
         annotated_frame = visualizer.annotate_frame(frame, tracked_detections, history.history)
