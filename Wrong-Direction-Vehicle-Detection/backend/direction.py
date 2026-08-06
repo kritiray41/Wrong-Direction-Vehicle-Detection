@@ -1,44 +1,61 @@
 import numpy as np
 
 class DirectionAnalyzer:
-    def __init__(self, allowed_direction_vector=(0, 1)):
-        """
-        Initializes the direction analyzer.
+    def __init__(self):
+        # We track each vehicle ID so a single slow car doesn't add 100 tallies to the count
+        self.vehicle_directions = {} 
         
-        Parameters:
-            allowed_direction_vector (tuple): A vector (x, y) representing the legal 
-                                              traffic flow direction. 
-                                              Default (0, 1) means moving DOWN the screen.
-                                              (0, -1) would mean moving UP the screen.
-        """
-        self.allowed_vector = np.array(allowed_direction_vector)
+        # Tallies to learn the "normal" flow of the road
+        self.left_up = 0
+        self.left_down = 0
+        self.right_up = 0
+        self.right_down = 0
+        
+        # Minimum number of cars needed to establish what is "normal"
+        self.min_samples = 3 
 
-    def compute_movement_vector(self, previous_centroid, current_centroid):
-        """
-        Computes the movement vector between two centroid points.
-        """
-        return np.array(current_centroid) - np.array(previous_centroid)
-
-    def check_wrong_direction(self, previous_centroid, current_centroid):
-        """
-        Uses dot product to make a wrong direction decision.
-        
-        Returns:
-            bool: True if moving in the wrong direction, False otherwise.
-        """
-        # 1. Compute movement vector
-        movement_vector = self.compute_movement_vector(previous_centroid, current_centroid)
-        
-        # If the vehicle hasn't moved (vector length is 0), it's not going the wrong way
-        if np.linalg.norm(movement_vector) == 0:
+    def check_wrong_direction(self, tracker_id, trajectory, frame_width):
+        # We need a decent path history to judge direction
+        if len(trajectory) < 5:
             return False
-            
-        # 2. Dot-product implementation
-        dot_product = np.dot(movement_vector, self.allowed_vector)
+
+        # Check total Y-axis travel from where the car started to where it is now
+        start_centroid = trajectory[0]
+        current_centroid = trajectory[-1]
         
-        # 3. Wrong direction decision
-        # A negative dot product means the angle between vectors is > 90 degrees
-        if dot_product < 0:
-            return True
+        dy = current_centroid[1] - start_centroid[1]
+        
+        # Ignore horizontal movements or parked cars
+        if abs(dy) < 5.0:
+            return False
+
+        is_left_half = current_centroid[0] < (frame_width / 2)
+        is_moving_down = dy > 0  # In OpenCV, Y increases as you go down the screen
+
+        # 1. TALLY THE FLOW (Watch and Learn)
+        # Only register a car's direction once so the tallies are accurate
+        if tracker_id not in self.vehicle_directions:
+            self.vehicle_directions[tracker_id] = is_moving_down
             
+            if is_left_half:
+                if is_moving_down: self.left_down += 1
+                else: self.left_up += 1
+            else:
+                if is_moving_down: self.right_down += 1
+                else: self.right_up += 1
+
+        # 2. CATCH THE OUTLIERS (Flag the Violators)
+        if is_left_half:
+            if (self.left_up + self.left_down) >= self.min_samples:
+                if self.left_up > self.left_down: # Normal flow is UP
+                    return is_moving_down         # Violation if moving DOWN
+                elif self.left_down > self.left_up: # Normal flow is DOWN
+                    return not is_moving_down     # Violation if moving UP
+        else:
+            if (self.right_up + self.right_down) >= self.min_samples:
+                if self.right_up > self.right_down: # Normal flow is UP
+                    return is_moving_down
+                elif self.right_down > self.right_up: # Normal flow is DOWN
+                    return not is_moving_down
+
         return False

@@ -1,8 +1,8 @@
 import cv2
 import os
 import sys
+import numpy as np
 
-# Add the parent directory to the system path so we can import from 'utils'
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.detection import VehicleDetector
@@ -10,19 +10,16 @@ from backend.tracking import VehicleTracker
 from backend.direction import DirectionAnalyzer
 from utils.visualizer import VideoVisualizer, VehicleHistory
 from utils.logger import ViolationLogger
+from utils.snapshot import SnapshotManager
 
 def run_dashboard_pipeline(video_source):
-    """
-    A generator that processes video frames and yields them for a frontend dashboard,
-    along with any real-time violation data.
-    """
-    # Initialize all backend processing modules
     detector = VehicleDetector()
     tracker = VehicleTracker()
-    direction_analyzer = DirectionAnalyzer(allowed_direction_vector=(0, 1))
+    direction_analyzer = DirectionAnalyzer()
     visualizer = VideoVisualizer()
     history = VehicleHistory()
     logger = ViolationLogger()
+    snapshot_mgr = SnapshotManager()  
     
     cap = cv2.VideoCapture(video_source)
     
@@ -31,46 +28,44 @@ def run_dashboard_pipeline(video_source):
         if not ret:
             break
             
-        # Detect and Track
         detections = detector.detect_vehicles(frame)
         tracked_detections = tracker.update_tracks(detections)
-        
-        # Update centroid history
         current_centroids = history.update_history(tracked_detections)
         
-        # Wrong Direction Logic
         wrong_way_ids = []
         for tracker_id, current_centroid in current_centroids.items():
             trajectory = history.history[tracker_id]
             
-            if len(trajectory) > 5: 
-                previous_centroid = trajectory[0]
-                is_wrong_way = direction_analyzer.check_wrong_direction(previous_centroid, current_centroid)
+            # Pass the tracker ID, the full path trajectory, and the frame width
+            is_wrong_way = direction_analyzer.check_wrong_direction(tracker_id, trajectory, frame.shape[1])
+            
+            if is_wrong_way:
+                clean_id = int(tracker_id) # Strip out the np.int64 formatting!
+                wrong_way_ids.append(clean_id)
+                logger.log_violation(clean_id)
                 
-                if is_wrong_way:
-                    wrong_way_ids.append(tracker_id)
-                    logger.log_violation(tracker_id)
-        
-        # Draw bounding boxes, labels, and trails
+                if hasattr(tracked_detections, 'tracker_id') and tracked_detections.tracker_id is not None:
+                    idx = np.where(tracked_detections.tracker_id == tracker_id)[0]
+                    if len(idx) > 0:
+                        bbox = tracked_detections.xyxy[idx[0]]
+                        snapshot_mgr.save_snapshot(frame, clean_id, bbox)
+
         annotated_frame = visualizer.annotate_frame(frame, tracked_detections, history.history)
         
-        # Add visual alert directly to the video if a wrong-way driver is found
         if wrong_way_ids:
+            # Format the alert text beautifully as clean integers
+            display_ids = ", ".join([str(i) for i in wrong_way_ids])
             cv2.putText(
                 annotated_frame, 
-                f"WRONG WAY DETECTED: ID {wrong_way_ids}", 
+                f"WRONG WAY DETECTED: ID {display_ids}", 
                 (20, 100),
                 cv2.FONT_HERSHEY_SIMPLEX, 
-                1.5, 
+                1.2, 
                 (0, 0, 255), 
-                4
+                3
             )
             
-        # Streamlit expects images in RGB format, but OpenCV uses BGR.
-        # We must convert the color space before sending it to the frontend.
         frame_rgb = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
-        
-        # Connect detection pipeline: Yield the frame and data instead of returning or saving
         yield frame_rgb, wrong_way_ids
         
     cap.release()
