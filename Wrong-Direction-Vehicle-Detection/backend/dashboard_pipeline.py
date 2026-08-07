@@ -40,7 +40,7 @@ def run_dashboard_pipeline(video_source):
             is_wrong_way = direction_analyzer.check_wrong_direction(tracker_id, trajectory, frame.shape[1])
             
             if is_wrong_way:
-                clean_id = int(tracker_id) # Strip out the np.int64 formatting!
+                clean_id = int(tracker_id) 
                 wrong_way_ids.append(clean_id)
                 logger.log_violation(clean_id)
                 
@@ -53,17 +53,24 @@ def run_dashboard_pipeline(video_source):
         annotated_frame = visualizer.annotate_frame(frame, tracked_detections, history.history)
         
         if wrong_way_ids:
-            # Format the alert text beautifully as clean integers
-            display_ids = ", ".join([str(i) for i in wrong_way_ids])
-            cv2.putText(
-                annotated_frame, 
-                f"WRONG WAY DETECTED: ID {display_ids}", 
-                (20, 100),
-                cv2.FONT_HERSHEY_SIMPLEX, 
-                1.2, 
-                (0, 0, 255), 
-                3
-            )
+            # Limit to the 5 most recent IDs to prevent horizontal text overlapping/overflow
+            display_ids = ", ".join([str(i) for i in wrong_way_ids[-5:]])
+            alert_text = f"VIOLATION - IDs: {display_ids}"
+            
+            # OpenCV Text Setup
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 1.0
+            thickness = 3
+            
+            # Calculate text size to draw a perfect background box
+            (text_width, text_height), baseline = cv2.getTextSize(alert_text, font, font_scale, thickness)
+            x, y = 20, 60
+            
+            # Draw Solid Black Rectangle (Background)
+            cv2.rectangle(annotated_frame, (x - 5, y - text_height - 5), (x + text_width + 5, y + baseline + 5), (0, 0, 0), cv2.FILLED)
+            
+            # Draw Neon Red Text (Foreground)
+            cv2.putText(annotated_frame, alert_text, (x, y), font, font_scale, (0, 0, 255), thickness)
             
         frame_rgb = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
         yield frame_rgb, wrong_way_ids
