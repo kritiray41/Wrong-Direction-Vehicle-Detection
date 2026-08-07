@@ -66,7 +66,7 @@ class VideoVisualizer:
         Sets up the OpenCV VideoWriter to save the final output.
         """
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        return cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        return cv2.VideoWriter(output_path, fourcc, fps, (width, height)) 
 
     def annotate_frame(self, frame, detections, history_dict=None):
         """
