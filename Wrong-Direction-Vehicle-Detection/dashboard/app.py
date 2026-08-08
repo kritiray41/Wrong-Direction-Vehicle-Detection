@@ -27,7 +27,7 @@ soc_industrial_css = """
 /* Hide default streamlit menu & footer for clean OS look */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
-header {visibility: hidden;}
+
 
 /* Top System Status Bar Style */
 .soc-header-bar {
