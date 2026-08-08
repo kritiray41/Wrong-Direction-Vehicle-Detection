@@ -66,6 +66,7 @@ flowchart TD
     G --> H[ Snapshot Crop & CSV Audit Logger]
     F --> I[ SOC Terminal Dashboard]
     H --> I
+```
 
 ### 🔍 Pipeline Details
 1. **Frame Ingestion:** Reads frames via OpenCV video capture streams.
@@ -114,3 +115,79 @@ Wrong-Direction-Vehicle-Detection/
 ├── packages.txt              # System-level Linux dependencies (OpenCV)
 ├── requirements.txt          # Python dependencies
 └── README.md                 # Project documentation
+
+
+
+```
+## 🚀 Quick Start
+
+**1. Clone the repository and navigate to the root directory:**
+```bash
+git clone [https://github.com/](https://github.com/)<your-username>/Wrong-Direction-Vehicle-Detection.git
+cd Wrong-Direction-Vehicle-Detection
+
+```
+**2. Create and activate a virtual environment:**
+```bash
+# Linux/macOS
+python3 -m venv venv
+source venv/bin/activate
+
+# Windows
+python -m venv venv
+venv\Scripts\activate
+```
+**3. Install the required Python packages:**
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+**4. Start the Streamlit application:**
+```bash
+streamlit run dashboard/app.py
+```
+*Open your browser and navigate to `http://localhost:8501`.*
+
+---
+
+## 🖥️ Dashboard & UI
+
+> **Industrial SOC Terminal:** Designed with a matte graphite surface, high-contrast telemetry readouts, and Apple-level spacing for a professional Security Operations Center environment.
+
+```text
+──────────────────────────────────────────────────────────────────────
+ Wrong Direction Detection                            ONLINE
+ Operator : TESTUSER                                  Camera : CAM-02
+──────────────────────────────────────────────────────────────────────
+ ╭──────────────────────────────────╮ ╭─────────────────────────────╮
+ │                                  │ │ TELEMETRY                   │
+ │                                  │ │                             │
+ │            OPTICAL FEED          │ │ Active Violations      12   │
+ │             LIVE STREAM          │ │ Vehicles Tracked       48   │
+ │                                  │ │ Stream FPS            31.2  │
+ │                                  │ │ Status             Running  │
+ ╰──────────────────────────────────╯ ╰─────────────────────────────╯
+ ╭──────────────────────────────────────────────────────────────────╮
+ │ DETECTED VIOLATIONS REGISTRY                                     │
+ ╰──────────────────────────────────────────────────────────────────╯
+ ╭──────────────────────────────────────────────────────────────────╮
+ │ EVIDENCE SNAPSHOTS                                               │
+ ╰──────────────────────────────────────────────────────────────────╯
+```
+## 🔀 Configuration & Road Layouts
+
+The system supports adaptive direction analysis. The `DirectionAnalyzer` handles various traffic configurations:
+
+*   **Two-Way Traffic (Left-Hand / India & UK):** Left lane flows UP, Right lane flows DOWN.
+*   **Two-Way Traffic (Right-Hand / US & EU):** Left lane flows DOWN, Right lane flows UP.
+*   **One-Way Highways:** All lanes enforced in a single uniform direction.
+*   **Self-Calibrating Anomaly Mode:** Automatically observes initial vehicle trajectories to establish baseline flow without manual configuration.
+
+---
+
+## 📄 License & Acknowledgments
+
+This project is open-source under the **Educational License**.
+
+Special thanks to the developers and maintainers of **Ultralytics YOLOv8**, **Roboflow Supervision**, **ByteTrack**, and **Streamlit** for providing the foundations that made this system possible.
+
