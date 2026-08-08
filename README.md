@@ -50,30 +50,7 @@ Rather than relying purely on rigid tripwires, the pipeline dynamically computes
 |  **Audit Trail Logging** | Generates thread-safe CSV logs with timestamps, track IDs, and violation metadata. |
 |  **Industrial SOC UI** | High-contrast Streamlit terminal featuring live telemetry, metrics, and evidence galleries. |
 
-## Project Structure
 
-Wrong-Direction-Vehicle-Detection/
-├── backend/
-│   ├── detection.py          # YOLO model loading & inference engine
-│   ├── tracking.py           # ByteTrack integration & ID maintenance
-│   ├── direction.py          # Vector math & direction analysis
-│   └── pipeline.py           # Main processing loop generator
-├── dashboard/
-│   ├── app.py                # Streamlit SOC terminal interface
-│   ├── pages/                # Supplementary dashboard pages
-│   └── components/           # Custom UI components & galleries
-├── logs/                     # Generated CSV violation logs
-├── models/                   # Pretrained YOLO model weights (.pt)
-├── outputs/                  # Annotated output videos & evidence
-├── snapshots/                 # Automatically cropped violation images
-├── utils/
-│   ├── logger.py             # Thread-safe CSV logging utility
-│   ├── snapshot.py           # Image cropping & evidence manager
-│   └── visualizer.py         # Bounding box & trajectory rendering
-├── main.py                   # CLI pipeline execution entrypoint
-├── packages.txt              # System-level Linux dependencies (OpenCV)
-├── requirements.txt          # Python dependencies
-└── README.md                 # Project documentation
 ---
 
 ##  System Architecture
