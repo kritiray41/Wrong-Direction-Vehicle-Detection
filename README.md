@@ -57,7 +57,7 @@ Rather than relying purely on rigid tripwires, the pipeline dynamically computes
 
 ```mermaid
 flowchart TD
-    A[ Video Input Stream] --> B[🔍 YOLOv8 Detection Engine]
+    A[ Video Input Stream] --> B[ YOLOv8 Detection Engine]
     B --> C[ ByteTrack Tracking System]
     C --> D[ Trajectory History Manager]
     D --> E[ Self-Calibrating Anomaly Analyzer]
