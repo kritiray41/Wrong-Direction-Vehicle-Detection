@@ -1,67 +1,67 @@
 #  Wrong Direction Vehicle Detection System
 
+<div align="center">
+
 ![Python Version](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-000000?style=for-the-badge)
 ![OpenCV](https://img.shields.io/badge/OpenCV-Computer_Vision-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 ![License](https://img.shields.io/badge/License-Educational-green?style=for-the-badge)
 
-An intelligent, real-time computer vision system that identifies vehicles traveling against permitted traffic flow directions on roadways, logs violations automatically, and displays insights via an interactive dashboard.
+<br/>
+
+**A state-of-the-art, real-time computer vision & telemetry solution designed to detect vehicles traveling against permitted traffic flow, automatically capture violation evidence, and display actionable telemetry via a SOC-grade terminal.**
+
+[Explore Features](#-key-features) • [System Architecture](#-system-architecture) • [Quick Start](#-quick-start) • [Dashboard Overview](#-dashboard--ui)
+
+</div>
 
 ---
 
-##  Project Overview
+##  Table of Contents
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Quick Start Guide](#-quick-start)
+- [Dashboard & UI](#-dashboard--ui)
+- [Configuration & Road Layouts](#-configuration--road-layouts)
+- [License & Acknowledgments](#-license--acknowledgments)
 
-Traffic violations involving wrong-way driving pose high safety risks on highways and urban roads. This system leverages deep learning for vehicle detection and multi-object tracking to analyze movement vectors frame-by-frame. By computing vector alignment via dot-product operations against allowed road trajectory vectors, the pipeline flags violations, triggers visual alerts, logs incident metadata, and saves evidence snapshots.
+---
+
+##  Overview
+
+Wrong-way driving (WWD) on highways and urban roads is a primary contributor to severe traffic fatalities. This system addresses the issue by integrating **deep learning detection (YOLOv8)** with **robust spatial tracking (ByteTrack)** and **Self-Calibrating Anomaly Detection**.
+
+Rather than relying purely on rigid tripwires, the pipeline dynamically computes vector movement angles and dot products relative to established lane flows. The result is an adaptive, high-precision monitoring system paired with a matte-graphite **Security Operations Center (SOC)** dashboard.
 
 ---
 
 ##  Key Features
 
-* **Vehicle Detection:** Powered by YOLOv8 for detection across multiple vehicle classes (cars, trucks, buses, motorcycles).
-* **Persistent Tracking:** Uses ByteTrack to maintain continuous track IDs and spatial trajectories across frames.
-* **Vector-Based Logic:** Directional analysis utilizing vector movement angles and dot-product calculations relative to defined road vectors.
-* **Violation Confirmation & Alerts:** State management to confirm consecutive-frame violations and prevent false positives.
-* **Automated CSV Logging:** Logs timestamps, unique track IDs, and violation details while preventing duplicate entries.
-* **Evidence Snapshot Management:** Automatically captures and saves annotated images of offending vehicles.
-* **Interactive Dashboard:** Built with Streamlit to upload raw footage, view processing pipelines, browse violation tables, and inspect snapshot evidence.
-
----
-
-## 🛠️ Tech Stack
-
-| Domain | Tools & Frameworks |
+| Feature | Description |
 | :--- | :--- |
-| **Language** | Python 3.9+ |
-| **Detection & Vision** | YOLOv8 (Ultralytics), OpenCV, Supervision |
-| **Object Tracking** | ByteTrack |
-| **Numerical Processing** | NumPy |
-| **Dashboard & UI** | Streamlit |
-| **Version Control** | Git, GitHub |
+|  **Multi-Class Detection** | Real-time localization of cars, trucks, buses, and motorcycles powered by YOLOv8. |
+|  **Persistent Tracking** | Maintains continuous track IDs and spatial trajectory trails across frames using ByteTrack. |
+|  **Self-Calibrating Logic** | Dynamically analyzes direction vectors to adapt to 1-way, 2-way, or angled traffic flows. |
+|  **Evidence Capture** | Automatically crops and stores high-resolution snapshot captures of offending vehicles. |
+|  **Audit Trail Logging** | Generates thread-safe CSV logs with timestamps, track IDs, and violation metadata. |
+|  **Industrial SOC UI** | High-contrast Streamlit terminal featuring live telemetry, metrics, and evidence galleries. |
 
 ---
 
-##  Project Structure
+##  System Architecture
 
-```text
-Wrong-Direction-Vehicle-Detection/
-├── backend/
-│   ├── detection.py        # YOLO model loading & inference
-│   ├── tracking.py         # ByteTrack integration & ID maintenance
-│   ├── direction.py        # Movement vector computation & dot-product logic
-│   └── pipeline.py         # Main processing pipeline controller
-├── dashboard/
-│   ├── app.py              # Streamlit interface entrypoint
-│   ├── pages/              # Additional dashboard pages
-│   └── components/         # UI visualizers & galleries[cite: 1]
-├── logs/                   # Generated CSV violation logs[cite: 1]
-├── models/                 # Pretrained YOLO model weights (.pt)[cite: 1]
-├── outputs/                # Saved violation snapshots & annotated output videos[cite: 1]
-├── tests/                  # Unit tests and edge-case evaluation scripts[cite: 1]
-├── utils/
-│   ├── logger.py           # Thread-safe CSV logging utility[cite: 1]
-│   └── visualizer.py       # Bounding box, trajectory trail, & alert rendering[cite: 1]
-├── videos/                 # Input sample video files[cite: 1]
-├── .gitignore
-├── main.py                 # Pipeline execution entrypoint
-└── requirements.txt        # System dependencies[cite: 1]
+```mermaid
+flowchart TD
+    A[📹 Video Input Stream] --> B[🔍 YOLOv8 Detection Engine]
+    B --> C[ ByteTrack Tracking System]
+    C --> D[ Trajectory History Manager]
+    D --> E[ Self-Calibrating Anomaly Analyzer]
+    E -->|Normal Flow| F[ Render Trajectory Trails]
+    E -->|Violation Detected| G[ Trigger Alarm & Vector Alert]
+    G --> H[ Snapshot Crop & CSV Audit Logger]
+    F --> I[ SOC Terminal Dashboard]
+    H --> I
